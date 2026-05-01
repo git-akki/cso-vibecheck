@@ -1,3 +1,5 @@
+![cso-vibecheck](.github/social-preview.png)
+
 # cso-vibecheck
 
 ```
