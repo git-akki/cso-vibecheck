@@ -1,6 +1,17 @@
 # cso-vibecheck
 
+```
+  ██████╗███████╗ ██████╗     ██╗   ██╗██╗██████╗ ███████╗
+ ██╔════╝██╔════╝██╔═══██╗    ██║   ██║██║██╔══██╗██╔════╝
+ ██║     ███████╗██║   ██║    ██║   ██║██║██████╔╝█████╗  
+ ██║     ╚════██║██║   ██║    ╚██╗ ██╔╝██║██╔══██╗██╔══╝  
+ ╚██████╗███████║╚██████╔╝     ╚████╔╝ ██║██████╔╝███████╗
+  ╚═════╝╚══════╝ ╚═════╝       ╚═══╝  ╚═╝╚═════╝ ╚══════╝
+            senior-CSO security audit for vibe-coded apps
+```
+
 Senior-CSO security audit skill for vibe-coded apps (Cursor / Lovable / Bolt / Replit / v0 / Claude-built).
+
 
 Runs a deterministic, repeatable 20-layer audit and produces a structured report with `file:line` evidence and copy-paste remediation diffs.
 
@@ -70,6 +81,14 @@ Wiz Research (2025): 20% of vibe-coded apps ship serious flaws. ETH Zurich BaxBe
 Full procedure for each check: [`references/checks.md`](references/checks.md).
 
 ## Install
+
+One-liner:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/git-akki/cso-vibecheck/main/install.sh | bash
+```
+
+Or manual:
 
 ```bash
 git clone https://github.com/git-akki/cso-vibecheck.git ~/.claude/skills/cso-vibecheck
