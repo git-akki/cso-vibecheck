@@ -22,9 +22,27 @@ Real incidents this skill is anchored to:
 - **Cursor** — `.env` / `.cursor/` configs committed to git.
 - **Snake game (Claude)** — `pickle.loads` on network input → RCE.
 
+
+## What 318 vulnerabilities look like
+
+VibeWrench scanned 100 vibe-coded apps (2026):
+
+| Finding | % of apps | Covered by |
+|---|---|---|
+| Missing CSRF | 70% | Check 21 |
+| Exposed secrets / API keys | 41% | Checks 6, 16 |
+| Stack-trace leak | 36% | Check 8 |
+| Missing input validation | 28% | Checks 3-5 |
+| No endpoint auth | 21% | Checks 1, 11, 19 |
+| Missing security headers | 20% | Check 22 |
+| XSS | 18% | Check 5 |
+| Exposed Supabase creds | 12% | Checks 6, 13 |
+
+Wiz Research (2025): 20% of vibe-coded apps ship serious flaws. ETH Zurich BaxBench (2025): **45% of AI-generated code contains an OWASP Top 10 vulnerability.**
+
 ## What it covers
 
-20 layered checks:
+22 layered checks:
 
 1. API gateway rate limit + auth on paid-API routes
 2. Webhook signature verification (raw body, Stripe/Clerk/Resend)
@@ -46,6 +64,8 @@ Real incidents this skill is anchored to:
 18. No `pickle.loads` / `eval` / `yaml.load` / `Function()` / `shell:true` on user input
 19. Middleware coverage matches every protected route
 20. Server-side gating, not just client `useEffect` redirect
+21. CSRF protection on state-changing requests (70% of apps miss this)
+22. Security headers (CSP, HSTS, X-Frame-Options) + cookie flags + TLS enforcement
 
 Full procedure for each check: [`references/checks.md`](references/checks.md).
 
@@ -99,3 +119,4 @@ See [`references/report-template.md`](references/report-template.md) for the exa
 ## License
 
 MIT
+

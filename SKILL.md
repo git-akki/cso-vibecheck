@@ -22,12 +22,12 @@ Each layer has known failure modes. Audit layer by layer. Don't skip layers beca
 ## Workflow
 
 1. Discover the stack (read package.json, framework configs, env.example, next.config.*, vite.config.*, supabase/, prisma/, framework hints).
-2. Run the 20 checks in order. For each, follow the procedure in references/checks.md. Don't skip checks; if a check is N/A for the stack, mark it N/A with reason.
+2. Run the 22 checks in order. For each, follow the procedure in references/checks.md. Don't skip checks; if a check is N/A for the stack, mark it N/A with reason.
 3. Score each finding: P0 (production-breaking, exploitable now), P1 (exploitable with effort), P2 (defense-in-depth gap), N/A.
 4. Output the report in the exact template below.
 5. Generate diffs for every P0 and P1 finding — actual code the user can paste.
 
-## The 20 checks (summary)
+## The 22 checks (summary)
 
 | # | Layer | Check | Anchor incident |
 |---|---|---|---|
@@ -52,6 +52,9 @@ Each layer has known failure modes. Audit layer by layer. Don't skip layers beca
 | 19 | Auth | Middleware coverage matches every protected route | DryRun wired-wrong |
 | 20 | Auth | Server-side gating, not just client useEffect redirect | View-source bypass |
 
+| 21 | App Security | CSRF protection on state-changing requests | VibeWrench: 70% miss |
+| 22 | App Security | Security headers + cookies + TLS enforced | VibeWrench: 20% miss |
+
 Detailed procedure for each check: see references/checks.md.
 
 ## How to actually run a check
@@ -74,7 +77,7 @@ Write like a senior security engineer the user trusts. Direct, specific, no fluf
 
 ## Quick triage mode
 
-If the user says "quick scan" or "just the critical stuff", run only checks 6, 11, 12, 13, 16 — these cover ~80 percent of real vibe-coded breaches (key in client, IDOR, RLS off, env exposed). Output the same report structure with only those checks.
+If the user says "quick scan" or "just the critical stuff", run only checks 6, 11, 12, 13, 16, 21 — these cover ~80 percent of real vibe-coded breaches (key in client, IDOR, RLS off, env exposed). Output the same report structure with only those checks.
 
 ## Don't do
 

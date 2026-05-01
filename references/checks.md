@@ -261,3 +261,80 @@ Route                | Middleware | Inline auth | Protected?
 rg -n "useEffect.*router\.push.*(login|signin|/auth)" --type tsx
 ```
 For each, confirm the page's data fetching also runs server-side auth (Server Components, `getServerSideProps`, route handler with auth). Client-only redirect = view-source bypass.
+
+---
+
+## Check 21 — CSRF protection on state-changing requests
+
+**Why:** VibeWrench scan of 100 vibe-coded apps: **70% missing CSRF protection** — the single most common vuln. Vibe-coded SPA + cookie-auth backends almost always ship without it. Attacker hosts a form on attacker.com → user visits → action executes as them.
+
+**Locate:**
+```bash
+# Express / Node — look for csurf, csrf-csrf, double-submit cookie, or sameSite=Strict
+rg -n "csurf|csrf-csrf|csrfToken|sameSite" --type ts --type js
+# Next.js — server actions get CSRF for free; pages-router APIs do NOT
+rg -n "export\s+(default\s+)?async\s+function\s+(POST|PUT|DELETE|PATCH)" app/api pages/api
+# Django / Flask
+rg -n "csrf_protect|csrf_exempt|@csrf|WTF_CSRF" --type py
+```
+
+**Verify:**
+- App Router server actions: CSRF handled by Next.js (origin check). OK.
+- Pages-router API routes / Express / Flask with cookie auth: REQUIRES explicit CSRF token OR `SameSite=Strict` cookies (Lax is not enough for top-level POST).
+- Pure Bearer-token APIs (Authorization header from JS, no cookies): CSRF not applicable.
+
+**Fix template (Express):**
+```ts
+import { csrfSync } from 'csrf-sync'
+const { csrfSynchronisedProtection } = csrfSync({ getTokenFromRequest: (req) => req.headers['x-csrf-token'] })
+app.use(csrfSynchronisedProtection)
+```
+
+**Fix template (cookie config):**
+```ts
+res.cookie('session', token, { httpOnly: true, secure: true, sameSite: 'strict', path: '/' })
+```
+
+---
+
+## Check 22 — Security headers, cookies, TLS
+
+**Why:** 20% of vibe-coded apps ship without basic security headers (VibeWrench). 5-second fix, blocks an entire class of attacks (clickjacking, MIME sniffing, mixed-content downgrade, XSS escalation).
+
+**Locate (live URL):**
+```bash
+curl -sI https://APP_URL | grep -iE "content-security-policy|strict-transport-security|x-frame-options|x-content-type-options|referrer-policy|permissions-policy"
+```
+
+**Required headers (production):**
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+- `Content-Security-Policy: default-src 'self'; ...` (start strict, loosen as needed; report-only first if existing app)
+- `X-Frame-Options: DENY` (or CSP `frame-ancestors 'none'`)
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()` — drop what's not needed
+
+**Cookies:** every auth/session cookie must have `Secure; HttpOnly; SameSite=Strict` (or `Lax` if cross-site nav needed).
+
+**TLS:** confirm HTTPS is enforced (redirect from HTTP), no mixed content, TLS 1.2+ only.
+
+**Locate cookies in code:**
+```bash
+rg -n "res\.cookie\(|setCookie\(|Set-Cookie" --type ts --type js
+```
+
+**Fix (Next.js — `next.config.js`):**
+```js
+const securityHeaders = [
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+]
+module.exports = {
+  async headers() { return [{ source: '/:path*', headers: securityHeaders }] },
+}
+```
+
+CSP needs app-specific tuning — start with `report-only` and a `report-uri` endpoint.

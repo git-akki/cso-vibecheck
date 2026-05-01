@@ -31,3 +31,34 @@ Claude wrote a multiplayer snake game; network layer used Python pickle for obje
 - 91.5% have at least one AI-hallucination-related flaw (Q1 2026).
 - 78% expose env files.
 - 11% of public Supabase apps leak service keys.
+
+---
+
+## VibeWrench scan — 318 vulns across 100 vibe-coded apps (2026)
+
+Real-world frequency data. Cite this when prioritizing checks.
+
+| Finding | % of apps | Maps to check |
+|---|---|---|
+| Missing CSRF protection | 70% | Check 21 |
+| Exposed secrets / API keys | 41% | Checks 6, 16 |
+| Poor error handling (stack-trace leak) | 36% | Check 8 |
+| Missing input validation | 28% | Checks 3, 4, 5 |
+| No auth on endpoints | 21% | Checks 1, 11, 19 |
+| Missing security headers | 20% | Check 22 |
+| XSS | 18% | Check 5 |
+| Exposed Supabase creds | 12% | Checks 6, 13 |
+
+## Wiz Research — 4 dominant patterns
+1. Client-side auth logic (passwords validated in browser) — Check 20
+2. Hardcoded API keys in client code — Check 6
+3. Missing/weak Supabase RLS — Check 13
+4. Internal tools publicly deployed without auth — Checks 1, 19
+
+## BaxBench / ETH Zurich (2025)
+**45% of AI-generated code contains an OWASP Top 10 vulnerability.** Single most-cited stat. Use as the headline.
+
+## Source attribution
+- VibeWrench: dev.to/vibewrench/i-scanned-100-vibe-coded-apps-for-security
+- Wiz Research: wiz.io/blog/common-security-risks-in-vibe-coded-apps
+- BaxBench: ETH Zurich AI code security benchmark, 2025

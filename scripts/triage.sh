@@ -47,3 +47,14 @@ grep -rnE "createClient\([^)]+SERVICE_ROLE" --include='*.ts' --include='*.tsx' .
 
 echo
 echo "==> done. Run the full /cso-vibecheck audit for the remaining 14 checks."
+
+echo
+echo "## CSRF / cookie hardening (Check 21)"
+if grep -rEq "res\.cookie\(|setCookie\(" --include='*.ts' --include='*.js' . 2>/dev/null; then
+  if ! grep -rEq "sameSite\s*:\s*['\"]strict|sameSite\s*:\s*['\"]lax" --include='*.ts' --include='*.js' . 2>/dev/null; then
+    flag "cookies set without sameSite — possible CSRF"
+  fi
+fi
+if ! grep -rEq "csurf|csrf-csrf|csrfToken|csrf_protect|@csrf|WTF_CSRF" . 2>/dev/null; then
+  echo "  [check] no CSRF library detected — verify SameSite=Strict or App-Router server actions"
+fi
